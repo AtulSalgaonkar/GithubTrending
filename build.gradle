@@ -21,6 +21,13 @@ allprojects {
     }
 }
 
+ext {
+    gson_converter = "2.8.6"
+    lifecycle_version = "2.2.0"
+    retrofit2 = "2.9.0"
+    nav_version = '2.3.3'
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
