@@ -30,13 +30,11 @@ class GithubTrendingWorker(
     }
 
     override fun createWork(): Single<Result> {
-        Log.d(TAG, "createWork: ")
         val repository = GitHubRepoRepository(GithHubRepoDataSource())
 
         val localBroadcastManager = mContext?.let { LocalBroadcastManager.getInstance(it) }
 
         return Single.create { observer ->
-            Log.d(TAG, "createWork: Single.create")
             repository.getGitHubTrendingDetails()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -50,15 +48,12 @@ class GithubTrendingWorker(
                             // if data sync successful then ui update with broadcast receiver
                             val intent = Intent()
                             intent.action = "data_sync_ui_update"
-                            Log.d(TAG, "onSuccess: Single onSuccess")
                             localBroadcastManager?.sendBroadcast(intent)
                         }
-                        Log.d(TAG, "onSuccess: Single response")
                         observer.onSuccess(Result.success())
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.d(TAG, "onSuccess: Single onError")
                         observer.onSuccess(Result.success())
                     }
                 })

@@ -31,7 +31,6 @@ class TrendingListActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == "data_sync_ui_update") {
                 if (!isFinishing) {
-                    Log.d(TAG, "onReceive: data_sync_ui_update")
                     fetchData(true)
                 }
             }
@@ -83,13 +82,11 @@ class TrendingListActivity : AppCompatActivity() {
             binding.progressCircular.visibility = View.GONE
             if (resultData is Result.Success) {
                 if (resultData.data == null || resultData.data.size == 0) {
-                    Log.d(TAG, "initObserve: " + getString(R.string.no_record_found))
                     binding.statusTv.text = getString(R.string.no_record_found)
                     binding.statusView.visibility = View.VISIBLE
                     binding.retryBtn.visibility = View.VISIBLE
                     binding.recyclerView.visibility = View.GONE
                 } else {
-                    Log.d(TAG, "initObserve resultData.data:\n" + resultData.data)
                     adapter.setData(resultData.data)
                     binding.statusView.visibility = View.GONE
                     binding.retryBtn.visibility = View.GONE
@@ -97,7 +94,6 @@ class TrendingListActivity : AppCompatActivity() {
                 }
             } else if (resultData is Result.Error) {
                 resultData.exception.printStackTrace()
-                Log.d(TAG, "initObserve: " + resultData.exception.message)
                 binding.statusTv.text = getString(R.string.error_try_again)
                 binding.statusView.visibility = View.VISIBLE
                 binding.retryBtn.visibility = View.VISIBLE
@@ -109,13 +105,11 @@ class TrendingListActivity : AppCompatActivity() {
             binding.progressCircular.visibility = View.GONE
             if (resultData is Result.Success) {
                 if (resultData.data == null || resultData.data.size == 0) {
-                    Log.d(TAG, "initObserve: " + getString(R.string.no_record_found))
                     binding.statusTv.text = getString(R.string.no_record_found)
                     binding.statusView.visibility = View.VISIBLE
                     binding.retryBtn.visibility = View.VISIBLE
                     binding.recyclerView.visibility = View.GONE
                 } else {
-                    Log.d(TAG, "initObserve resultData.data:\n" + resultData.data)
                     adapter.setData(resultData.data)
                     binding.statusView.visibility = View.GONE
                     binding.retryBtn.visibility = View.GONE
@@ -123,7 +117,6 @@ class TrendingListActivity : AppCompatActivity() {
                 }
             } else if (resultData is Result.Error) {
                 resultData.exception.printStackTrace()
-                Log.d(TAG, "initObserve: " + resultData.exception.message)
                 binding.statusTv.text = getString(R.string.error_try_again)
                 binding.statusView.visibility = View.VISIBLE
                 binding.retryBtn.visibility = View.VISIBLE
