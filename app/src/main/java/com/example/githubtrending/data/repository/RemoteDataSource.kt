@@ -2,7 +2,9 @@ package com.example.githubtrending.data.repository
 
 import android.content.Context
 import com.example.githubtrending.BaseApplication
-import com.example.githubtrending.R
+import com.example.githubtrending.data.local.dao.GithubTrendingDao
+import com.example.githubtrending.data.local.db.AppDatabase
+import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.data.model.ResponseModel
 import com.example.githubtrending.data.remote.APIClient
 import com.example.githubtrending.data.remote.api.APIService
@@ -23,54 +25,69 @@ class RemoteDataSource(
 
     // Get Employees details based on location
     fun getGitHubTrendingDetails(): Single<Result<ResponseModel>> {
+        val db: AppDatabase = AppDatabase.getDatabase(applicationContext)
+        val githubTrendingDao = db.githubTrendingDao()
         return Single.create { emitter ->
-            val apiCall: Call<ResponseModel> = apiService.getGitHubTrendingData(
-                "android",
-                "stars",
+            val apiCall: Call<List<Item>> = apiService.getGitHubTrendingData(
+                "application/vnd.github.v3+json",
                 "desc",
                 "100",
                 "1"
             )
-            apiCall.enqueue(object : Callback<ResponseModel> {
+            apiCall.enqueue(object : Callback<List<Item>> {
                 override fun onResponse(
-                    call: Call<ResponseModel>,
-                    response: Response<ResponseModel>
+                    call: Call<List<Item>>,
+                    response: Response<List<Item>>
                 ) {
                     when (response.code()) {
                         200 -> {
-                            val responseModel: ResponseModel = response.body() as ResponseModel
-                            if (!responseModel.incompleteResults) {
-                                /*responseModel.items?.let { data ->
-                                    Single.create<Unit> {
-                                        githubTrendingDao.nukeItemTable()
-                                        data.let { githubTrendingDao.insertItem(it) }
-                                    }.subscribeOn(Schedulers.io())
-                                        .subscribe()
-                                }*/
-                                emitter.onSuccess(Result.Success(responseModel))
-                            } else {
-                                val errorJsonString =
-                                    applicationContext.getString(R.string.error_try_again)
-                                emitter.onSuccess(Result.Error(Exception(errorJsonString)))
+                            val items: List<Item>? = response.body()
+                            items?.let { repos ->
+                                Single.create<Unit> {
+                                    githubTrendingDao.nukeItemTable()
+                                    githubTrendingDao.nukeOwnerTable()
+                                    repos.forEach { repo ->
+                                        repo.owner?.let {
+                                            val insertOwnerId: Int =
+                                                githubTrendingDao.insertOwner(it).toInt()
+                                            repo.ownerUuid = insertOwnerId
+                                            repo.let { githubTrendingDao.insertItem(it) }
+                                        }
+                                    }
+                                }.subscribeOn(Schedulers.io())
+                                    .subscribe()
                             }
+                            emitter.onSuccess(Result.Success(ResponseModel(items = items as ArrayList)))
                         }
                         else -> {
-                            val errorJsonString = response.errorBody()?.string()
-                            emitter.onSuccess(Result.Error(Exception(errorJsonString)))
+                            getLocalData(githubTrendingDao) { responseModelLocal ->
+                                if (responseModelLocal != null) {
+                                    emitter.onSuccess(Result.Success(responseModelLocal))
+                                } else {
+                                    val errorJsonString = response.errorBody()?.string()
+                                    emitter.onSuccess(Result.Error(Exception(errorJsonString)))
+                                }
+                            }
                         }
                     }
 
                 }
 
-                override fun onFailure(call: Call<ResponseModel>, t: Throwable) {
-                    emitter.onSuccess(Result.Error(Exception(t.message)))
+                override fun onFailure(call: Call<List<Item>>, t: Throwable) {
+                    getLocalData(githubTrendingDao) { responseModelLocal ->
+                        if (responseModelLocal != null) {
+                            emitter.onSuccess(Result.Success(responseModelLocal))
+                        } else {
+                            emitter.onSuccess(Result.Error(Exception(t.message)))
+                        }
+                    }
                 }
             })
         }
     }
 
     // get offline data
-    /*private fun getLocalData(
+    private fun getLocalData(
         githubTrendingDao: GithubTrendingDao,
         func: (ResponseModel?) -> Unit
     ) {
@@ -91,5 +108,5 @@ class RemoteDataSource(
                     func(null)
                 }
             })
-    }*/
+    }
 }

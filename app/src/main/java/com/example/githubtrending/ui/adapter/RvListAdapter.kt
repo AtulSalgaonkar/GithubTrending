@@ -5,11 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.githubtrending.R
 import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.databinding.ChildRepoViewBinding
 
 class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
-
 
     private var dataList: ArrayList<Item>? = ArrayList()
 
@@ -58,14 +58,14 @@ class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
 
             viewBind?.avatarIv?.let {
                 Glide.with(it)
-                    .load(data.owner.avatarUrl)
-                    .thumbnail()
+                    .load(data.owner?.avatarUrl)
+                    .placeholder(R.drawable.android_logo)
                     .into(it)
             }
             viewBind?.userNameTv?.text = data.name
             viewBind?.repoUrlTv?.text = data.htmlUrl
 
-            viewBind?.archiveIv?.visibility = if (data.archived) View.VISIBLE else View.INVISIBLE
+            viewBind?.archiveIv?.visibility = if (data.archived == true) View.VISIBLE else View.INVISIBLE
         }
 
     }
