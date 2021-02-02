@@ -17,9 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GithubTrending"
         tools:targetApi="n">
-        <activity android:name=".ui.repository.RepositoryActivity"></activity>
         <activity android:name=".ui.repository.RepositoryActivity" />
-        <activity android:name=".ui.RepositoryActivity" />
         <activity android:name=".ui.home.TrendingListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +25,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".receiver.OnBootCompleted">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

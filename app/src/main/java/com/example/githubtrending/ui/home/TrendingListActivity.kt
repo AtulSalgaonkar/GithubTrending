@@ -30,6 +30,7 @@ class TrendingListActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == "data_sync_ui_update") {
                 if (!isFinishing) {
+                    Log.d(TAG, "onReceive: data_sync_ui_update")
                     fetchData(true)
                 }
             }

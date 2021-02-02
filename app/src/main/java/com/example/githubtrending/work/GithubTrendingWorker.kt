@@ -2,6 +2,7 @@ package com.example.githubtrending.work
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.RxWorker
 import androidx.work.WorkerParameters
@@ -20,6 +21,7 @@ class GithubTrendingWorker(
 ) :
     RxWorker(context, workerParameters) {
 
+    private val TAG = "GithubTrendingWorker"
     private var mContext: Context? = null
 
     init {
@@ -27,11 +29,13 @@ class GithubTrendingWorker(
     }
 
     override fun createWork(): Single<Result> {
+        Log.d(TAG, "createWork: ")
         val repository = GitHubRepoRepository(RemoteDataSource())
 
         val localBroadcastManager = mContext?.let { LocalBroadcastManager.getInstance(it) }
 
         return Single.create { observer ->
+            Log.d(TAG, "createWork: Single.create")
             repository.getGitHubTrendingDetails()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -45,12 +49,15 @@ class GithubTrendingWorker(
                             // if data sync successful then ui update with broadcast receiver
                             val intent = Intent()
                             intent.action = "data_sync_ui_update"
+                            Log.d(TAG, "onSuccess: Single onSuccess")
                             localBroadcastManager?.sendBroadcast(intent)
                         }
+                        Log.d(TAG, "onSuccess: Single response")
                         observer.onSuccess(Result.success())
                     }
 
                     override fun onError(e: Throwable) {
+                        Log.d(TAG, "onSuccess: Single onError")
                         observer.onSuccess(Result.success())
                     }
                 })
