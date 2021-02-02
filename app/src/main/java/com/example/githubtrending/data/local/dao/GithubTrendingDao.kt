@@ -14,7 +14,7 @@ interface GithubTrendingDao {
     fun insertItem(item: Item)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertItems(countryAll: List<Item>)
+    fun insertItems(itemsAll: List<Item>)
 
     @Delete
     fun deleteItem(item: Item)
@@ -30,7 +30,7 @@ interface GithubTrendingDao {
     fun insertOwner(Owner: Owner) : Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOwner(countryAll: List<Owner>)
+    fun insertOwner(ownerAll: List<Owner>)
 
     @Delete
     fun deleteOwner(owner: Owner)

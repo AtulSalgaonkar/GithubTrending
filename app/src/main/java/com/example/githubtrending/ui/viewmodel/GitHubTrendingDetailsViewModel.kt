@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.data.model.ResponseModel
 import com.example.githubtrending.data.repository.GitHubRepoRepository
-import com.example.githubtrending.data.repository.RemoteDataSource
+import com.example.githubtrending.data.repository.GithHubRepoDataSource
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -14,12 +14,15 @@ import com.example.githubtrending.data.model.Result
 
 class GitHubTrendingDetailsViewModel : ViewModel() {
 
-    private var repository: GitHubRepoRepository = GitHubRepoRepository(RemoteDataSource())
+    private var repository: GitHubRepoRepository = GitHubRepoRepository(GithHubRepoDataSource())
 
+    // api response live data
     val gitHubTrendingLiveData: MutableLiveData<Result<ArrayList<Item>>> = MutableLiveData()
+
+    // local response live data
     val gitHubTrendingLocalLiveData: MutableLiveData<Result<ArrayList<Item>>> = MutableLiveData()
 
-    // Get country list
+    // Get get trending repository data from api
     fun getTrendingAndroidReposList() {
         getGitHubTrendingDetails({}, { result ->
             if (result is Result.Success) {
@@ -33,6 +36,7 @@ class GitHubTrendingDetailsViewModel : ViewModel() {
         })
     }
 
+    // Get get trending repository data from local
     fun getTrendingAndroidReposListLocal() {
         getGitHubTrendingDetailsLocal({}, { result ->
             if (result is Result.Success) {
@@ -76,8 +80,8 @@ class GitHubTrendingDetailsViewModel : ViewModel() {
 
     /**
      * Common function for getting Github repositories list from local
-     * @param onSuccessDetails -> success result from api call
-     * @param onErrorDetails -> returns error from api call
+     * @param onSuccessDetails -> success result from local
+     * @param onErrorDetails -> returns error from local
      */
     private fun getGitHubTrendingDetailsLocal(
         onSubscribeDetails: (Disposable) -> Unit,

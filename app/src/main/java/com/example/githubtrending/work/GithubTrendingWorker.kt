@@ -8,13 +8,14 @@ import androidx.work.RxWorker
 import androidx.work.WorkerParameters
 import com.example.githubtrending.data.model.ResponseModel
 import com.example.githubtrending.data.repository.GitHubRepoRepository
-import com.example.githubtrending.data.repository.RemoteDataSource
+import com.example.githubtrending.data.repository.GithHubRepoDataSource
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
+// work manager for sync github trending repository to local db
 class GithubTrendingWorker(
     context: Context,
     workerParameters: WorkerParameters
@@ -30,7 +31,7 @@ class GithubTrendingWorker(
 
     override fun createWork(): Single<Result> {
         Log.d(TAG, "createWork: ")
-        val repository = GitHubRepoRepository(RemoteDataSource())
+        val repository = GitHubRepoRepository(GithHubRepoDataSource())
 
         val localBroadcastManager = mContext?.let { LocalBroadcastManager.getInstance(it) }
 

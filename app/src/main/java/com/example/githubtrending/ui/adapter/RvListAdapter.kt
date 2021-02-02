@@ -15,9 +15,7 @@ class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
 
     private var dataList: ArrayList<Item>? = ArrayList()
 
-    /**
-     * set data in recyclerview
-     */
+    // set data in recyclerview
     fun setData(dataList: ArrayList<Item>) {
         this.dataList = dataList
         notifyDataSetChanged()

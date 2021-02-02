@@ -17,7 +17,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import com.example.githubtrending.data.model.Result
 
-class RemoteDataSource(
+class GithHubRepoDataSource(
     var apiService: APIService = APIClient.getClient,
     var applicationContext: Context = BaseApplication.applicationContext()
 ) {

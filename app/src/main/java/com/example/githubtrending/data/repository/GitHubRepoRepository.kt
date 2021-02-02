@@ -4,14 +4,14 @@ import com.example.githubtrending.data.model.ResponseModel
 import com.example.githubtrending.data.model.Result
 import io.reactivex.Single
 
-class GitHubRepoRepository(var remoteDataSource: RemoteDataSource) {
+class GitHubRepoRepository(var githHubRepoDataSource: GithHubRepoDataSource) {
 
     fun getGitHubTrendingDetails(): Single<Result<ResponseModel>> {
-        return remoteDataSource.getGitHubTrendingDetails()
+        return githHubRepoDataSource.getGitHubTrendingDetails()
     }
 
     fun getGitHubTrendingDetailsLocal(): Single<Result<ResponseModel>> {
-        return remoteDataSource.getGitHubTrendingDetailsLocal()
+        return githHubRepoDataSource.getGitHubTrendingDetailsLocal()
     }
 
 }

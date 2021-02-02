@@ -26,6 +26,7 @@ class TrendingListActivity : AppCompatActivity() {
     private val TAG = "HomeActivity"
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
+    // broadcast receiver for refresh ui after new data is synced with local db
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == "data_sync_ui_update") {
@@ -59,7 +60,7 @@ class TrendingListActivity : AppCompatActivity() {
 
         initRecyclerView()
 
-        initObserve()
+        initObserver()
 
         binding.retryBtn.setOnClickListener {
             fetchData()
@@ -68,6 +69,7 @@ class TrendingListActivity : AppCompatActivity() {
         fetchData()
     }
 
+    // fetch data from local or from api
     private fun fetchData(isFromLocal: Boolean = false) {
         binding.progressCircular.visibility = View.VISIBLE
         if (isFromLocal)
@@ -76,7 +78,7 @@ class TrendingListActivity : AppCompatActivity() {
             viewModel.getTrendingAndroidReposList()
     }
 
-    private fun initObserve() {
+    private fun initObserver() {
         viewModel.gitHubTrendingLiveData.observe(this) { resultData ->
             binding.progressCircular.visibility = View.GONE
             if (resultData is Result.Success) {

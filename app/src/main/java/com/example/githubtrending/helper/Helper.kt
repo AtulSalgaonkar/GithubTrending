@@ -9,6 +9,7 @@ class Helper {
 
     companion object {
 
+        // instantiate work manager
         fun initiateWorkManager(context: Context) {
             val workManager = WorkManager.getInstance(context)
 

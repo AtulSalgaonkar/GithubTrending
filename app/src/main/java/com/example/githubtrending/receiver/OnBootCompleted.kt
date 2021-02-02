@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.util.Log
 import com.example.githubtrending.helper.Helper
 
+// Boot Completed receiver for set work after restart of device
 class OnBootCompleted : BroadcastReceiver() {
 
     private val TAG = "OnBootCompleted"
