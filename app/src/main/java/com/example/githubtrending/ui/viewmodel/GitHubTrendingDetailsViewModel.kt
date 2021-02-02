@@ -1,4 +1,4 @@
-package com.example.githubtrending.ui.home
+package com.example.githubtrending.ui.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,6 +17,7 @@ class GitHubTrendingDetailsViewModel : ViewModel() {
     private var repository: GitHubRepoRepository = GitHubRepoRepository(RemoteDataSource())
 
     val gitHubTrendingLiveData: MutableLiveData<Result<ArrayList<Item>>> = MutableLiveData()
+    val gitHubTrendingLocalLiveData: MutableLiveData<Result<ArrayList<Item>>> = MutableLiveData()
 
     // Get country list
     fun getTrendingAndroidReposList() {
@@ -32,8 +33,21 @@ class GitHubTrendingDetailsViewModel : ViewModel() {
         })
     }
 
+    fun getTrendingAndroidReposListLocal() {
+        getGitHubTrendingDetailsLocal({}, { result ->
+            if (result is Result.Success) {
+                val itemData = result.data?.items
+                gitHubTrendingLocalLiveData.value = Result.Success(itemData)
+            } else if (result is Result.Error) {
+                gitHubTrendingLocalLiveData.value = result
+            }
+        }, { e ->
+            gitHubTrendingLocalLiveData.value = Result.Error(Exception(e.message))
+        })
+    }
+
     /**
-     * Common function for getting Employee Details data
+     * Common function for getting Github repositories list
      * @param onSuccessDetails -> success result from api call
      * @param onErrorDetails -> returns error from api call
      */
@@ -43,6 +57,34 @@ class GitHubTrendingDetailsViewModel : ViewModel() {
         onErrorDetails: (Throwable) -> Unit
     ) {
         repository.getGitHubTrendingDetails()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<Result<ResponseModel>> {
+                override fun onSubscribe(d: Disposable) {
+                    onSubscribeDetails(d)
+                }
+
+                override fun onSuccess(result: Result<ResponseModel>) {
+                    onSuccessDetails(result)
+                }
+
+                override fun onError(e: Throwable) {
+                    onErrorDetails(e)
+                }
+            })
+    }
+
+    /**
+     * Common function for getting Github repositories list from local
+     * @param onSuccessDetails -> success result from api call
+     * @param onErrorDetails -> returns error from api call
+     */
+    private fun getGitHubTrendingDetailsLocal(
+        onSubscribeDetails: (Disposable) -> Unit,
+        onSuccessDetails: (Result<ResponseModel>) -> Unit,
+        onErrorDetails: (Throwable) -> Unit
+    ) {
+        repository.getGitHubTrendingDetailsLocal()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<Result<ResponseModel>> {

@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.githubtrending.BaseApplication
 import com.example.githubtrending.data.local.dao.GithubTrendingDao
 import com.example.githubtrending.data.local.db.AppDatabase
-import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.data.model.ResponseModel
 import com.example.githubtrending.data.remote.APIClient
 import com.example.githubtrending.data.remote.api.APIService
@@ -23,26 +22,21 @@ class RemoteDataSource(
     var applicationContext: Context = BaseApplication.applicationContext()
 ) {
 
-    // Get Employees details based on location
+    // Get github trending list based on location
     fun getGitHubTrendingDetails(): Single<Result<ResponseModel>> {
         val db: AppDatabase = AppDatabase.getDatabase(applicationContext)
         val githubTrendingDao = db.githubTrendingDao()
         return Single.create { emitter ->
-            val apiCall: Call<List<Item>> = apiService.getGitHubTrendingData(
-                "application/vnd.github.v3+json",
-                "desc",
-                "100",
-                "1"
-            )
-            apiCall.enqueue(object : Callback<List<Item>> {
+            val apiCall: Call<ResponseModel> = apiService.getGitHubTrendingData()
+            apiCall.enqueue(object : Callback<ResponseModel> {
                 override fun onResponse(
-                    call: Call<List<Item>>,
-                    response: Response<List<Item>>
+                    call: Call<ResponseModel>,
+                    response: Response<ResponseModel>
                 ) {
                     when (response.code()) {
                         200 -> {
-                            val items: List<Item>? = response.body()
-                            items?.let { repos ->
+                            val responseModel: ResponseModel? = response.body()
+                            responseModel?.items?.let { repos ->
                                 Single.create<Unit> {
                                     githubTrendingDao.nukeItemTable()
                                     githubTrendingDao.nukeOwnerTable()
@@ -54,10 +48,14 @@ class RemoteDataSource(
                                             repo.let { githubTrendingDao.insertItem(it) }
                                         }
                                     }
+                                    emitter.onSuccess(Result.Success(responseModel))
                                 }.subscribeOn(Schedulers.io())
                                     .subscribe()
                             }
-                            emitter.onSuccess(Result.Success(ResponseModel(items = items as ArrayList)))
+
+                            if (responseModel?.items == null || responseModel.items!!.size == 0) {
+                                emitter.onSuccess(Result.Error(Exception("Error please try again!")))
+                            }
                         }
                         else -> {
                             getLocalData(githubTrendingDao) { responseModelLocal ->
@@ -73,7 +71,7 @@ class RemoteDataSource(
 
                 }
 
-                override fun onFailure(call: Call<List<Item>>, t: Throwable) {
+                override fun onFailure(call: Call<ResponseModel>, t: Throwable) {
                     getLocalData(githubTrendingDao) { responseModelLocal ->
                         if (responseModelLocal != null) {
                             emitter.onSuccess(Result.Success(responseModelLocal))
@@ -83,6 +81,21 @@ class RemoteDataSource(
                     }
                 }
             })
+        }
+    }
+
+    // Get github trending list based on location from local
+    fun getGitHubTrendingDetailsLocal(): Single<Result<ResponseModel>> {
+        val db: AppDatabase = AppDatabase.getDatabase(applicationContext)
+        val githubTrendingDao = db.githubTrendingDao()
+        return Single.create { emitter ->
+            getLocalData(githubTrendingDao) { responseModelLocal ->
+                if (responseModelLocal != null) {
+                    emitter.onSuccess(Result.Success(responseModelLocal))
+                } else {
+                    emitter.onSuccess(Result.Error(Exception("Error please try again!")))
+                }
+            }
         }
     }
 

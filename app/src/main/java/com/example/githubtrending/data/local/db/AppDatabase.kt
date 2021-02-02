@@ -8,9 +8,11 @@ import com.example.githubtrending.data.local.dao.GithubTrendingDao
 import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.data.model.Owner
 
-@Database(entities = [
-    Item::class,
-    Owner::class], version = 1)
+@Database(
+    entities = [
+        Item::class,
+        Owner::class], version = 1
+)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun githubTrendingDao(): GithubTrendingDao
 
@@ -18,6 +20,7 @@ abstract class AppDatabase : RoomDatabase(){
         private var INSTANCE: AppDatabase? = null
 
         // Get instance of local db
+        @Synchronized
         fun getDatabase(context: Context): AppDatabase {
             INSTANCE = INSTANCE ?: Room.databaseBuilder(
                 context,

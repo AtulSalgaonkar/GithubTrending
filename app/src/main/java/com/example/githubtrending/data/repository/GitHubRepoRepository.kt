@@ -10,4 +10,8 @@ class GitHubRepoRepository(var remoteDataSource: RemoteDataSource) {
         return remoteDataSource.getGitHubTrendingDetails()
     }
 
+    fun getGitHubTrendingDetailsLocal(): Single<Result<ResponseModel>> {
+        return remoteDataSource.getGitHubTrendingDetailsLocal()
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.githubtrending.ui.adapter
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.example.githubtrending.R
 import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.databinding.ChildRepoViewBinding
+import com.example.githubtrending.ui.repository.RepositoryActivity
 
 class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
 
@@ -52,10 +54,15 @@ class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
 
         init {
             viewBind = bind
+            viewBind?.root?.setOnClickListener {
+                val intent = Intent(it.context, RepositoryActivity::class.java)
+                intent.putExtra("item_key", dataList?.get(adapterPosition))
+                intent.putExtra("owner_key", dataList?.get(adapterPosition)?.owner)
+                it.context.startActivity(intent)
+            }
         }
 
         fun setData(data: Item) {
-
             viewBind?.avatarIv?.let {
                 Glide.with(it)
                     .load(data.owner?.avatarUrl)
@@ -65,7 +72,8 @@ class RvListAdapter : RecyclerView.Adapter<RvListAdapter.ItemViewHolder>() {
             viewBind?.userNameTv?.text = data.name
             viewBind?.repoUrlTv?.text = data.htmlUrl
 
-            viewBind?.archiveIv?.visibility = if (data.archived == true) View.VISIBLE else View.INVISIBLE
+            viewBind?.archiveIv?.visibility =
+                if (data.archived == true) View.VISIBLE else View.INVISIBLE
         }
 
     }

@@ -27,6 +27,7 @@ ext {
     retrofit2 = "2.9.0"
     nav_version = '2.3.3'
     roomVersion = '2.2.6'
+    work_manager = '2.1.0'
 }
 
 task clean(type: Delete) {

@@ -8,12 +8,13 @@ import retrofit2.http.Query
 
 interface APIService {
 
-    @GET("orgs/android/repos")
+    @GET("search/repositories")
     fun getGitHubTrendingData(
-        @Query("accept") accept: String,
-        @Query("direction") direction: String,
-        @Query("per_page") per_page: String,
-        @Query("page") page: String
-    ): Call<List<Item>>
+        @Query("q") q: String = "android",
+        @Query("sort") sort: String = "stars",
+        @Query("order") order: String = "desc",
+        @Query("per_page") per_page: String = "100",
+        @Query("page") page: String = "1"
+    ): Call<ResponseModel>
 
 }

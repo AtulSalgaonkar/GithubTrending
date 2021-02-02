@@ -1,9 +1,6 @@
 package com.example.githubtrending.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.example.githubtrending.data.model.Item
 import com.example.githubtrending.data.model.Owner
 
@@ -13,10 +10,10 @@ interface GithubTrendingDao {
     @Query("SELECT * FROM item_tbl")
     fun getItem(): List<Item>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItem(item: Item)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItems(countryAll: List<Item>)
 
     @Delete
@@ -29,10 +26,10 @@ interface GithubTrendingDao {
     @Query("SELECT * FROM owner_tbl")
     fun getOwner(): List<Owner>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOwner(Owner: Owner) : Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOwner(countryAll: List<Owner>)
 
     @Delete
